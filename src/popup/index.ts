@@ -4,6 +4,7 @@ import routes from '~pages'
 import '../assets/base.scss'
 import App from './app.vue'
 import './index.scss'
+import { createPinia } from 'pinia'
 
 routes.push({
   path: '/',
@@ -23,4 +24,5 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
-createApp(App).use(router).mount('#app')
+const pinia = createPinia()
+createApp(App).use(router).use(pinia).mount('#app')

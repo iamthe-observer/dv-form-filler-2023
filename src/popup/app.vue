@@ -1,21 +1,18 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useAppStore } from '../store/app';
+// import { useRouter } from 'vue-router'
+
+onMounted(async () => {
+  // const router = useRouter();
+  // router.push('/main')
+  await useAppStore().onInitLoadAppData();
+  console.log(useAppStore().profile);
+
+})
+</script>
 
 <template>
-  <header
-    aria-label="Site Header"
-    class="bg-gray-50"
-  >
-    Popup Header
-  </header>
-
   <RouterView></RouterView>
-
-  <footer
-    aria-label="Site Footer"
-    class="bg-gray-50"
-  >
-    Popup Footer
-  </footer>
 </template>
 
 <style scoped></style>

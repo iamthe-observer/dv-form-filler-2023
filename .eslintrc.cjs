@@ -24,5 +24,6 @@ module.exports = {
     'vue/multi-word-component-names': 'off',
     'no-unref': 'off',
     'no-undef': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
   },
 }
