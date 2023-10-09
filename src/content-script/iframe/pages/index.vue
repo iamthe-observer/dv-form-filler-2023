@@ -1,7 +1,9 @@
 <template>
-  <div class="text-red font-bold text-xl">Cotnent Script Iframe</div>
+  <div class=""></div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+
+</script>
 
 <style scoped></style>

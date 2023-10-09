@@ -23,6 +23,5 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
-console.log({ routes })
-
+// const pinia = createPinia()
 createApp(App).use(router).mount('#app')

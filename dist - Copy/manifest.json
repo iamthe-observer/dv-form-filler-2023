@@ -1,0 +1,59 @@
+{
+  "name": "EG-Datapoint Form Filler",
+  "description": "A Vue 3 + Vite project for building Chrome extensions",
+  "version": "0.0.1.0",
+  "version_name": "0.0.1",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "src/popup/index.html"
+  },
+  "background": {
+    "service_worker": "service-worker-loader.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "assets/index.ts-loader-7e5262fb.js"
+      ],
+      "all_frames": false,
+      "matches": [
+        "*://*/*"
+      ],
+      "run_at": "document_end",
+      "css": [
+        "assets/index-8afe8ab0.css"
+      ]
+    }
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "options_page": "src/options/index.html",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "identity"
+  ],
+  "web_accessible_resources": [
+    {
+      "matches": [
+        "*://*/*"
+      ],
+      "resources": [
+        "src/content-script/index.ts",
+        "src/content-script/iframe/index.html"
+      ],
+      "use_dynamic_url": false
+    },
+    {
+      "matches": [
+        "*://*/*"
+      ],
+      "resources": [
+        "assets/index.ts-fa261a2a.js"
+      ],
+      "use_dynamic_url": true
+    }
+  ]
+}

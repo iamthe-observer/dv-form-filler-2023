@@ -3,7 +3,7 @@
 
 		<header :class="['flex items-center w-full', !apl_count ? 'justify-end' : 'justify-between']">
 			<RandomText v-if="apl_count" :idx="5" class="font-semibold text-lg"
-				:ctnt="`Hello, ${profile.fullname} [${apl_count}]`" :increment="10" :speed="10">
+				:ctnt="`Hello, ${profile?.fullname} [${apl_count}]`" :increment="10" :speed="10">
 			</RandomText>
 
 			<span
@@ -36,13 +36,13 @@
 
 
 			<div class="w-full pt-5 flex gap-2">
-				<button @mouseenter="showName = true" @mouseleave="showName = false"
+				<button ref="btn"
 					class="w-full bg-neutral-700 text-white text-lg font-semibold rounded-xl py-2 px-4 hover:bg-neutral-500 border-4 border-neutral-800 relative"
 					@click="__.goToApl(next_to_confirm.apl!)">
 					<span
 						class="absolute -top-3 -right-3 min-w-[30px] flex justify-center items-center rounded-full aspect-square bg-red-400 text-black font-bold text-sm border-2 border-red-600">#{{
-							next_to_confirm.index == 0 ? '' : next_to_confirm.index + 1 }}</span>
-					<span v-if="!showName" class="">Next to Confirm</span>
+							next_to_confirm.index + 1 }}</span>
+					<span v-if="!if_hover" class="">Next to Confirm</span>
 					<span v-else class="">{{ next_to_confirm.apl!.fullName }}</span>
 				</button>
 			</div>
@@ -55,8 +55,8 @@
 				class="w-full h-12 placeholder:text-neutral-400 placeholder:text-[1rem] placeholder:font-semibold placeholder:uppercase tracking-wider font-semibold text-neutral-300 focus:outline-none bg-neutral-800 border-neutral-600 border-2 rounded-xl text-center text-xl"
 				placeholder="Search">
 
-			<button ref="go"
-				:class="['h-12 bg-neutral-800 border-neutral-600 border-2 rounded-xl text-center font-bold uppercase text-xl aspect-square ml-2 transition-all duration-300 ease-out hover:bg-purple-500', search.length == 0 ? 'border-none w-0 ml-0 opacity-0' : '']"
+			<button v-if="search.length > 0"
+				:class="['h-12 bg-neutral-800 border-neutral-600 border-2 rounded-xl text-center font-bold uppercase text-xl aspect-square ml-2 transition-all duration-300 ease-out hover:bg-purple-500']"
 				@click="handleSearch">
 				Go
 			</button>
@@ -77,18 +77,24 @@ const { search, my_apls, profile, monthly_confirmed_apls } = storeToRefs(__)
 const router = useRouter()
 const apl_count = computed(() => my_apls?.value!.length)
 const confirmed_apls = computed(() => my_apls?.value.filter((a: any) => a.pconf_code))
-const showName = ref(false)
-const go = ref()
+const btn = ref<HTMLButtonElement>()
+const if_hover = useElementHover(btn)
 
 onBeforeMount(async () => {
+	await __.getMyApls()
+	await __.getProfiles()
+	__.getMonthlyConfirmedApls()
 	if (profile.value) {
-		await __.getMyApls()
-		__.getMonthlyConfirmedApls()
+		return
 	} else {
 		await __.getProfile()
-		await __.getMyApls()
-		__.getMonthlyConfirmedApls()
 	}
+})
+
+onMounted(() => {
+	let apl = localStorage.getItem('apl')
+	if (!apl) return
+	if (typeof JSON.parse(apl!) == 'object') __.goToApl(JSON.parse(apl!))
 })
 
 function getMonth(num: number) {
@@ -132,9 +138,10 @@ const next_to_confirm = computed(() => {
 	return { apl: apl, index }
 })
 
-function handleSearch() {
+async function handleSearch() {
 	__.$patch({ results: [] })
-	__.getSearch()
+	const data = await __.getSearch()
+	if (data?.length == 0) await __.getSearch(search.value, 'applicants_ex')
 	router.push('/search')
 }
 

@@ -1,21 +1,12 @@
 <script setup lang="ts"></script>
 
 <template>
-  <header
-    aria-label="Site Header"
-    class="bg-gray-50"
-  >
-    Content Script Iframe Header
-  </header>
-
-  <RouterView></RouterView>
-
-  <footer
-    aria-label="Site Footer"
-    class="bg-gray-50"
-  >
-    Content Script Iframe Footer
-  </footer>
+  <div class="py-1 px-2">
+    <header>EG Datapoint</header>
+    <div class="w-full h-full">
+      <RouterView></RouterView>
+    </div>
+  </div>
 </template>
 
 <style scoped></style>

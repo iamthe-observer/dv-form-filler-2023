@@ -26,12 +26,18 @@
 <script setup lang="ts">
 import { useAppStore } from '~/store/app';
 import { storeToRefs } from 'pinia';
+import { Applicant } from '~/interfaces/interfaces';
 
 const __ = useAppStore()
 const { results } = storeToRefs(__)
 
 async function handleClick(id: string) {
+	let apl2: Applicant[] | undefined;
 	let apl = await __.getApl(id)
+	if (apl?.length == 0) {
+		apl2 = await __.getApl(id, 'applicants_ex')
+		return __.goToApl(apl2![0])
+	}
 	__.goToApl(apl![0])
 }
 </script>

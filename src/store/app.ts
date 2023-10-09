@@ -1,15 +1,16 @@
 import { defineStore } from 'pinia'
 import { supabase } from '~/supabase/supabase'
 import { useRouter } from 'vue-router'
-import { Applicant } from '~/interfaces/interfaces'
+import { Applicant, Profile } from '~/interfaces/interfaces'
 
 export const useAppStore = defineStore('app', () => {
   const router = useRouter()
-  const profile = ref()
+  const profile = ref<Profile>()
+  const profiles = ref<Profile[]>()
   const search = ref('')
   const results = ref<Applicant[]>([])
   const my_apls = ref<Applicant[]>([])
-  const applicant = ref()
+  const applicant = ref<Applicant>()
   const app_loading = ref(true)
   const monthly_confirmed_apls = reactive([
     { month: 8, val: 0 },
@@ -27,6 +28,15 @@ export const useAppStore = defineStore('app', () => {
         .eq('id', user?.id)
       if (error) throw error
       profile.value = data![0]
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const getProfiles = async () => {
+    try {
+      const { data, error } = await supabase.from('profiles').select('*')
+      if (error) throw error
+      profiles.value = data!
     } catch (error) {
       console.log(error)
     }
@@ -91,6 +101,7 @@ export const useAppStore = defineStore('app', () => {
         .from(table)
         .select('*')
         .eq('apl_id', id)
+        .returns<Applicant[]>()
       if (error) throw error
       return data
     } catch (error) {
@@ -103,7 +114,7 @@ export const useAppStore = defineStore('app', () => {
       const { count } = await supabase
         .from('applicants')
         .select('*', { count: 'exact' })
-        .eq('user_id', profile.value.id)
+        .eq('user_id', profile.value!.id)
       return count
     } catch (error) {
       console.log(error)
@@ -115,7 +126,7 @@ export const useAppStore = defineStore('app', () => {
       const { data } = await supabase
         .from('applicants')
         .select('*')
-        .eq('user_id', profile.value.id)
+        .eq('user_id', profile.value!.id)
         .returns<Applicant[]>()
       my_apls.value = data!
       return data
@@ -139,12 +150,26 @@ export const useAppStore = defineStore('app', () => {
     monthly_confirmed_apls[2].val = oct.length
   }
 
+  async function downloadIMG(path: string) {
+    try {
+      const { data, error } = await supabase.storage
+        .from('applicants')
+        .download(path)
+      if (error) throw error
+      const url = URL.createObjectURL(data)
+      return url
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   function formatToMonth(date: Date): string {
     return date.toLocaleString('en-US', { month: 'short' })
   }
 
   function goToApl(apl: Applicant) {
     applicant.value = apl
+    localStorage.setItem('apl', JSON.stringify(apl))
     router.push('/applicant')
   }
 
@@ -206,17 +231,20 @@ export const useAppStore = defineStore('app', () => {
   }
 
   return {
+    downloadIMG,
     sortByRecency,
     goToApl,
     getMonthlyConfirmedApls,
     monthly_confirmed_apls,
     getProfile,
+    getProfiles,
     getApl,
     my_apls,
     getAplCount,
     getMyApls,
     onInitLoadAppData,
     profile,
+    profiles,
     search,
     results,
     getSearch,
